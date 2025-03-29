@@ -48,22 +48,36 @@ exports.loginUser = async(req,res) => {
     if(!email || !password){
         return res.status(400).json({message:"All fields are required"});
     }
-    try{
-        const user = await User.findOne({email});
-        if(!user || !(await user.comparePassword(password))){
-            return res.status(400).json({message: "Invalid credentials"});
+    try {
+        const user = await User.findOne({ email });
+        console.log("User found:", user);  // ✅ Debugging
+
+        if (!user) {
+            console.log("No user found with this email.");
+            return res.status(400).json({ message: "Invalid credentials" });
         }
+
+        // Debug password comparison
+        const isMatch = await user.comparePassword(password);
+        console.log("Password Match:", isMatch);  // ✅ Log if password is correct
+
+        if (!isMatch) {
+            console.log("Password does not match.");
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
         res.status(200).json({
             id: user._id,
             user,
             token: generateToken(user._id),
         });
-    } catch(err){
-        res
-        .status(500)
-        .json({message: "Error registering user", error: err.message});
+
+    } catch(err) {
+        console.error("Login Error:", err.message);  // ✅ Log actual errors
+        res.status(500).json({ message: "Server Error", error: err.message });
     }
 };
+
 
 //Get User Info
 exports.getUserInfo = async(req,res) => {
