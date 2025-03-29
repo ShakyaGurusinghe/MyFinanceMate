@@ -46,6 +46,7 @@ const Login = () => {
 
       if(token){
         localStorage.setItem("token", token);
+        console.log("Token set in localStorage:", token); // Log the token
         updateUser(user);
         navigate("/dashboard");
       }
